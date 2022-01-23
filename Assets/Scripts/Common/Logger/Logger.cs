@@ -15,11 +15,11 @@ public class Logger
     private static bool m_isInit = false;
     private static int counter = 0;
     private static StringBuilder sb = new StringBuilder();
-    public static string appVersion = string.Empty;
-    public static string resVersion = string.Empty;
-    public static string loginUid = string.Empty;
+    public static string appVersion = string.Empty;         //app版本
+    public static string resVersion = string.Empty;         //资源版本
+    public static string loginUid = string.Empty;            //登录uid
     public static string localIP = string.Empty;
-    public static string platName = string.Empty;
+    public static string platName = string.Empty;     
     public static string sceneName = "Launch";
     public static string DEBUG_BUILD_VER = "HOG_ALPHA_1";
     public static string platChannel = "outnet";
@@ -38,6 +38,7 @@ public class Logger
         Debug.Log(o);
     }
 
+    //主线程打印
     [Conditional("UNITY_EDITOR")]
     [Conditional("LOGGER_ON")]
     public static void LogToMainThread(string s, params object[] p)
@@ -63,6 +64,7 @@ public class Logger
 #if UNITY_EDITOR || LOGGER_ON
         Debug.LogError((p != null && p.Length > 0 ? string.Format(s, p) : s));
 #else
+        //可以上报到日志系统
         AddError(string.Format("clientversion:{0} uid: {1} device:{2} ip:{3} platname:{4} platChannel:{5} scenename:{6} debug_build_ver:{7} \n {8} ",
         clientVerstion, loginUid, (SystemInfo.deviceModel + "/" + SystemInfo.deviceUniqueIdentifier), localIP, platName, platChannel, sceneName, DEBUG_BUILD_VER,
         (p != null && p.Length > 0 ? string.Format(s, p) : s)));
@@ -100,7 +102,8 @@ public class Logger
             m_errorList.Add(errorStr);
         }
     }
-
+    
+    //日志上报
     private static void SendToHttpSvr(string postData)
     {
         if (!string.IsNullOrEmpty(postData))
@@ -108,6 +111,7 @@ public class Logger
             //Logger.Log("error:" + postData);
             if (!m_isInit)
             {
+                //在异步字符串上传操作完成时发生
                 m_webClient.UploadStringCompleted += new UploadStringCompletedEventHandler(OnUploadStringCompleted);
                 m_isInit = true;
             }

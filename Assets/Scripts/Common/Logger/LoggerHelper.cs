@@ -32,6 +32,7 @@ public class LoggerHelper : MonoSingleton<LoggerHelper>
     {
         if (!Application.isEditor)
         {
+            //监听Unity的打印事件，如常规打印，报错等等
             Application.logMessageReceived += (LogHandler);
 
             //关闭error上报定时器
@@ -106,6 +107,7 @@ public class LoggerHelper : MonoSingleton<LoggerHelper>
     {
         lock (backList)
         {
+            //添加主线程错误日志信息，update里循环监听
             backList.Add(new log_info(type, msg));
         }
     }
