@@ -3,8 +3,12 @@
 -- Lua面向对象设计
 --]]
 
+-- local tbl = {}
+-- local mt = {__mode = "k"}
+-- setmetatable(tbl, mt)
+
 --保存类类型的虚表
-local _class = {}
+local _class = {} -- 这个并不是弱表呀？？
  
 -- added by wsh @ 2017-12-09
 -- 自定义类型
@@ -39,6 +43,7 @@ function BaseClass(classname, super)
 		do
 			local create
 			create = function(c, ...)
+				-- 先调用子类__init再调用父类的__init
 				if c.super then
 					create(c.super, ...)
 				end
@@ -54,6 +59,7 @@ function BaseClass(classname, super)
 		obj.Delete = function(self)
 			local now_super = self._class_type 
 			while now_super ~= nil do	
+				-- 先调用子类__delete再调用父类的__delete
 				if now_super.__delete then
 					now_super.__delete(self)
 				end

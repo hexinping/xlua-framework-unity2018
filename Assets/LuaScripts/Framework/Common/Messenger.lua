@@ -29,10 +29,10 @@ end
 local function AddListener(self, e_type, e_listener, ...)
 	local event = self.events[e_type]
 	if event == nil then
-		event = setmetatable({}, {__mode = "k"})
+		event = setmetatable({}, {__mode = "k"}) -- 弱表
 	end
 	
-	for k, v in pairs(event) do
+	for k, v in pairs(event) do -- 一个对象不能重复注册消息事件
 		if k == e_listener then
 			error("Aready cotains listener : "..tostring(e_listener))
 			return

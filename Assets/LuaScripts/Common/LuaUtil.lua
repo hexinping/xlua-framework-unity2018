@@ -10,7 +10,7 @@ local unpack = unpack or table.unpack
 -- 解决原生pack的nil截断问题，SafePack与SafeUnpack要成对使用
 function SafePack(...)
 	local params = {...}
-	params.n = select('#', ...)
+	params.n = select('#', ...) --获取可变参数的数量
 	return params
 end
 

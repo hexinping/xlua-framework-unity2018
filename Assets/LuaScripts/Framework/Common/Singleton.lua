@@ -6,6 +6,7 @@
 local Singleton = BaseClass("Singleton");
 
 local function __init(self)
+	-- self._class_type.Instance ~= nil ==》 抛出异常
 	assert(rawget(self._class_type, "Instance") == nil, self._class_type.__cname.." to create singleton twice!")
 	rawset(self._class_type, "Instance", self)
 end

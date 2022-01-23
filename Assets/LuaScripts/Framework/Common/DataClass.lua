@@ -59,7 +59,7 @@ function DataClass(classname, data_tb, super)
 		data.New = nil
 		if Config.Debug then
 			-- 访问限制
-			data.__index = function(tb, key)
+			data.__index = function(tb, key) -- tb其实就是data
 				return DatakIndex(data, key)
 			end
 			data.__newindex = function(tb, key, value)
