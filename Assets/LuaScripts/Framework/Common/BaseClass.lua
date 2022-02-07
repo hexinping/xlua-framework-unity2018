@@ -8,8 +8,8 @@
 -- setmetatable(tbl, mt)
 
 --保存类类型的虚表
-local _class = {} -- 这个并不是弱表呀？？
- 
+local _class = {} 
+setmetatable(_class, {__mode = "k"})  -- add by hxp
 -- added by wsh @ 2017-12-09
 -- 自定义类型
 ClassType = {
@@ -37,7 +37,7 @@ function BaseClass(classname, super)
 		
 		-- 在初始化之前注册基类方法
 		setmetatable(obj, { 
-			__index = _class[class_type],
+			__index = _class[class_type], -- _class[class_type] 其实就是vtbl
 		})
 		-- 调用初始化方法
 		do
@@ -72,7 +72,8 @@ function BaseClass(classname, super)
 
 	local vtbl = {}
 	_class[class_type] = vtbl
- 
+ 	
+	-- 重写__newindex和__index 方法，读和写都从vtbl里取
 	setmetatable(class_type, {
 		__newindex = function(t,k,v)
 			vtbl[k] = v

@@ -24,6 +24,7 @@ public class Logger
     public static string DEBUG_BUILD_VER = "HOG_ALPHA_1";
     public static string platChannel = "outnet";
 
+    //多个Conditional之间是或的关系，UNITY_EDITOR或LOGGER_ON 存在就会执行
     [Conditional("UNITY_EDITOR")]
     [Conditional("LOGGER_ON")]
     static public void Log(string s, params object[] p)
