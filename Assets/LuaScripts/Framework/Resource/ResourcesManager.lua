@@ -53,6 +53,7 @@ local function LoadAsync(self, path, res_type, callback, ...)
 	assert(path ~= nil and type(path) == "string" and #path > 0, "path err : "..path)
 	assert(callback ~= nil and type(callback) == "function", "Need to provide a function as callback")
 	local args = SafePack(nil, ...)
+	--coroutine 是自己封装的lua类，内部也是调用lua原生的coroutine.create
 	coroutine.start(function()
 		local asset = self:CoLoadAsync(path, res_type, nil)
 		args[1] = asset
