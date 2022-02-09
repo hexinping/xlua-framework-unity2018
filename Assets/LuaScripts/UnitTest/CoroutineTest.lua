@@ -19,14 +19,19 @@ local function TestStart(finished_flag)
 	
 	local bbb = math.random(1, 30)
 	local bbb_record = bbb
+	print("coroutine.start and waitforframes1")
 	coroutine.start(function(var)
 		coroutine.waitforframes(math.random(1, 3))
+		print("coroutine.start and waitforframes2") -- 这句会在最后打印
 		bbb = bbb + var
 		assert(bbb == bbb_record + 11)
 		finished_flag["TestStart2"] = true
 	end, 11)
+	print("coroutine.start and waitforframes3")
 	-- 说明：协程函数体一进去就放弃了控制权，所以bbb的值不会马上被修改，这里一定不变
 	assert(bbb == bbb_record)
+	
+	-- 所以一般流程控制只要开一个协程，然后流程启动代码都放在协程里进行
 end
 
 -- 异常测试
@@ -215,7 +220,7 @@ local function InnerRun()
 	TestWaitWhile(finished_flag)
 	coroutine.waitforframes(math.random(1, 3))
 	TestStopWaiting(finished_flag)
-	
+
 	-- 等待协程运行完毕：检测是否有协程被挂起的BUG
 	local wait_start = Time.frameCount
 	coroutine.waituntil(function()
@@ -238,7 +243,9 @@ local function InnerRun()
 end
 
 local function Run()
-	coroutine.start(InnerRun)
+	print("CorountineTest Start!")
+	coroutine.start(InnerRun) -- 并不会阻断主线程
+	print("CorountineTest End!")
 end
 
 return {

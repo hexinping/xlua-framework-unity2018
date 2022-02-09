@@ -31,3 +31,10 @@ list		= require "Common.Tools.list"
 Queue		= require "Common.Tools.Queue"
 
 require "Common.Tools.event"
+
+
+-- add by hxp  测试使用
+require("Global.Global")
+require("Framework.Updater.Coroutine")
+local CoroutineTest = require("UnitTest.CoroutineTest")
+CoroutineTest.Run()
