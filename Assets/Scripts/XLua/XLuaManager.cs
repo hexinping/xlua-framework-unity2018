@@ -1,4 +1,5 @@
-﻿using AssetBundles;
+﻿using System;
+using AssetBundles;
 using System.IO;
 using UnityEngine;
 using XLua;
@@ -225,6 +226,16 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         }
         if (luaEnv != null)
         {
+            #if UNITY_EDITOR
+                this.luaEnv.FullGc();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                this.luaEnv.Tick();
+
+                // Check the unreleased reference.
+                this.luaEnv.DoString(
+                    "require('Common.util').print_func_ref_by_csharp()");
+            #endif
             try
             {
                 luaEnv.Dispose();

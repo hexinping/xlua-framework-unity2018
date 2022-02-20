@@ -72,10 +72,12 @@ local function TestYield(finished_flag)
 			if cb_count == 1 then
 				assert(#param == 1 and param[1] == frame_count + 5)
 				assert(Time.frameCount == frame_count + 5)
+				print("fu callback cb_count1 frame_count==",param[1])
 				return
 			elseif cb_count == 2 then
 				assert(#param == 1 and param[1] == "666")
 				assert(Time.frameCount == frame_count + 6)
+				print("fu callback cb_count2 frame_count==",param[1])
 				coroutine.waitforframes(12)
 				assert(Time.frameCount == frame_count + 18)
 				return
@@ -87,7 +89,7 @@ local function TestYield(finished_flag)
 			assert(inner_frame_count == frame_count)
 			coroutine.waitforframes(5)
 			-- yieldreturn测试
-			coroutine.yieldreturn(frame_count + 5)
+			coroutine.yieldreturn(frame_count + 5) -- 这个返回值会返回到父协程的回调函数里
 			-- yieldreturn一定会等待一帧
 			assert(Time.frameCount == frame_count + 6)
 			coroutine.yieldreturn("666")
@@ -96,6 +98,7 @@ local function TestYield(finished_flag)
 			return coroutine.yieldbreak(666, "finished")
 		end
 		-- 启动子级协程并等待
+		-- func 子协程启动方法，callback 父协程回调，后面参数为func的参数
 		local ret1, ret2 = coroutine.yieldstart(func, callback, frame_count)
 		assert(ret1 == 666 and ret2 == "finished")
 		-- yieldbreak不会等待一帧
@@ -163,7 +166,7 @@ local function TestWaitUntil(finished_flag)
 			return Time.frameCount == cur + 10
 		end
 		
-		coroutine.waituntil(until_func)
+		coroutine.waituntil(until_func) -- 等待条件满足
 		local frame_count = Time.frameCount
 		assert(frame_count == cur + 10)
 		finished_flag["TestWaitUntil"] = true
@@ -179,7 +182,7 @@ local function TestWaitWhile(finished_flag)
 			return Time.frameCount < cur + 10
 		end
 		
-		coroutine.waitwhile(while_func)
+		coroutine.waitwhile(while_func) -- 等待条件不满足
 		local frame_count = Time.frameCount
 		assert(frame_count == cur + 10)
 		finished_flag["TestWaitWhile"] = true
