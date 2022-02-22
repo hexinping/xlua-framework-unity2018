@@ -1,6 +1,6 @@
 -- 全局模块
 require "Global.Global"
-	
+
 -- 定义为全局模块，整个lua程序的入口类
 GameMain = {};
 
@@ -20,26 +20,32 @@ local function EnterGame()
 	if selected == nil or ServerData:GetInstance().servers[selected] == nil then
 		ClientData:GetInstance():SetLoginServerID(10001)
 	end
-	
+
 	SceneManager:GetInstance():SwitchScene(SceneConfig.LoginScene)
 end
 
 --主入口函数。从这里开始lua逻辑
 local function Start()
 	print("GameMain start...")
-	
+
 	-- 模块启动
 	UpdateManager:GetInstance():Startup()
 	TimerManager:GetInstance():Startup()
 	LogicUpdater:GetInstance():Startup()
 	UIManager:GetInstance():Startup()
-	
+
+	-- 居然不知道怎么用 差评
+	-- local timer = TimerManager:GetInstance():GetTimer(2, function (value)
+	-- 	print("TimerManager 延迟测试=====",value)
+	-- end, 111, true, false, false)
+	-- timer:Start()
+
 	-- if Config.Debug then
 	-- 	-- 单元测试
 	-- 	local UnitTest = require "UnitTest.UnitTestMain"
 	-- 	UnitTest.Run()
 	-- end
-	
+
 	coroutine.start(function()
 		EnterGame()
 	end)
