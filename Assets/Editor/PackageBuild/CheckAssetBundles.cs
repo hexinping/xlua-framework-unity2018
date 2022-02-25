@@ -75,7 +75,10 @@ public static class CheckAssetBundles
     
     public static void Run(bool checkChannel)
     {
+        //清除所有AB包名设置
         ClearAllAssetBundles();
+        
+        //跑所有的AB检测器（Checker）
         RunAllCheckers(checkChannel);
     }
 }

@@ -18,9 +18,9 @@ using UnityEditor;
 /// 2、提供Editor和Simulate模式，前者不适用Assetbundle，直接加载资源，快速开发；后者使用Assetbundle，用本地服务器模拟资源更新
 /// 3、场景不进行打包，场景资源打包为预设
 /// 4、只提供异步接口，所有加载按异步进行
-/// 5、采用LZMA压缩方式，性能瓶颈在Assetbundle加载上，ab加载异步，asset加载同步，ab加载后导出全部asset并卸载ab
+/// 5、采用LZMA压缩方式，性能瓶颈在Assetbundle加载上，ab加载异步，asset加载同步，ab加载后导出全部asset并卸载ab ???
 /// 6、所有公共ab包（被多个ab包依赖）常驻内存，非公共包加载asset以后立刻卸载，被依赖的公共ab包会随着资源预加载自动加载并常驻内存
-/// 7、随意卸载公共ab包可能导致内存资源重复，最好在切换场景时再手动清理不需要的公共ab包
+/// 7、随意卸载公共ab包可能导致内存资源重复，最好在切换场景时再手动清理不需要的公    共ab包
 /// 8、常驻包（公共ab包）引用计数不为0时手动清理无效，正在等待加载的所有ab包不能强行终止---一旦发起创建就一定要等操作结束，异步过程进行中清理无效
 /// 9、切换场景时最好预加载所有可能使用到的资源，所有加载器用完以后记得Dispose回收，清理GC时注意先释放所有Asset缓存
 /// 10、逻辑层所有Asset路径带文件类型后缀，且是AssetBundleConfig.ResourcesFolderName下的相对路径，注意：路径区分大小写
@@ -104,7 +104,11 @@ namespace AssetBundles
                 yield break;
             }
 #endif
-
+            /*
+             *1 加载Manifest，这个里面包含了所有AB和依赖关系
+             *2 加载AssetsPathMapping，这个里面包含了资源路径到AB路径的映射
+             *3 设置常驻AB包
+             */
             manifest = new Manifest();
             assetsPathMapping = new AssetsPathMapping();
             // 说明：同时请求资源可以提高加载速度
