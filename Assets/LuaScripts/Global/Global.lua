@@ -114,5 +114,5 @@ UpdateManager:GetInstance()
 SceneManager:GetInstance()
 AtlasManager:GetInstance()
 LogicUpdater:GetInstance()
-HallConnector:GetInstance()
+HallConnector:GetInstance()  -- 网络模块
 UIBoardManager:GetInstance()

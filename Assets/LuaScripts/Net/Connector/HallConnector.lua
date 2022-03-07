@@ -21,10 +21,12 @@ local ConnStatus = {
 local function __init(self)
 	self.hallSocket = nil
 	self.handlers = {}
-
+	
+	--测试code
 	local login = LoginHandler.New();
-	login:Init(self.handlers);
-
+	login:Init(self.handlers); -- 就定义了两个消息的处理函数
+	
+	-- loadPB文件
 	self:LoadPB();
 end
 
@@ -44,6 +46,7 @@ local function LoadPB()
 			assert(pb.loadfile("Assets/LuaScripts/"..path))
 		end)
 	else
+		-- 非window是下使用ab加载
 		table.walk(pbFiles,function(i,path)
 			ResourcesManager:GetInstance():LoadAsync("Lua/"..path..".bytes", typeof(CS.UnityEngine.TextAsset), function(data)
 				print(path.." pb load success")
@@ -56,7 +59,7 @@ end
 --接受数据
 local function OnReceivePackage(self, receive_bytes)
 	local msg_id = string.unpack("=I2",receive_bytes)
-	local msg_bytes = string.sub(receive_bytes, 3)
+	local msg_bytes = string.sub(receive_bytes, 3) --从第3个字节开始就是消息体内容
 
 	if(self.handlers[msg_id] == nil)then
 		Logger.Error("msg_id 未绑定函数"..msg_id);
@@ -70,7 +73,7 @@ local function OnReceivePackage(self, receive_bytes)
 		msg = pb.decode(MsgIDMap[msg_id], msg_bytes)
 	end
 
-	self.handlers[msg_id](msg_id, msg)
+	self.handlers[msg_id](msg_id, msg) -- 回调给业务层消息处理函数
 end
 
 --连接服务器
@@ -91,10 +94,13 @@ end
 -- 发送数据
 local function SendMessage(self, msg_id, msg)
 	local bytes = ""
+	
+	-- 消息ID，设置为大端编码，无符号整数
+	--https://blog.csdn.net/beyond706/article/details/105949783
 	bytes = bytes..string.pack("=I2",msg_id);
 	if(msg)then
 		local msg_bytes=pb.encode(MsgIDMap[msg_id], msg)
-		bytes = bytes..msg_bytes
+		bytes = bytes..msg_bytes -- 字符数组拼接？
 	end
 	
 	-- Logger.Debug("send message: \ncmdId："..msg_id.."\nbyte count："..#bytes.."\ntable->"..(msg and table.dump(msg) or "{}"));
@@ -123,7 +129,7 @@ end
 HallConnector.__init = __init
 HallConnector.Connect = Connect
 HallConnector.SendMessage = SendMessage
-HallConnector.Update = Update
+HallConnector.Update = Update  -- logicUpdate里会调用
 HallConnector.Disconnect = Disconnect
 HallConnector.Dispose = Dispose
 HallConnector.LoadPB = LoadPB

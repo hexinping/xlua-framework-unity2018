@@ -22,11 +22,21 @@ namespace CustomDataStruct
         static MemoryLeakDetecter bufferDetecter = MemoryLeakDetecter.Add(typeof(byte[]).FullName, 500, 1000);
 #endif
         const int BUFFER_POOL_SIZE = 500;
+        //StreamBuffer池，其实内部存的是MemoryStream
         static Dictionary<int, Queue<StreamBuffer>> streamPool = new Dictionary<int, Queue<StreamBuffer>>();
         static Dictionary<int, Queue<byte[]>> bufferPool = new Dictionary<int, Queue<byte[]>>();
         volatile static int streamCount = 0;
         volatile static int bufferCount = 0;
         
+        //从池子里拿一个streamBuffer
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expectedSize"> 内部存储字节数组的预期大小</param>
+        /// <param name="canWrite"></param>
+        /// <param name="canRead"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static StreamBuffer GetStream(int expectedSize, bool canWrite, bool canRead)
         {
             if (expectedSize <= 0) throw new Exception("expectedSize must > 0!");
@@ -52,7 +62,8 @@ namespace CustomDataStruct
             if(streamBuffer == null) streamBuffer = new StreamBuffer(expectedSize, canWrite, canRead);
             return streamBuffer;
         }
-
+        
+        //回收一个对象
         public static void RecycleStream(StreamBuffer stream)
         {
             if (stream == null || stream.size == 0) return;
@@ -221,6 +232,7 @@ namespace CustomDataStruct
 
         public void CopyFrom(byte[] src, int srcOffset, int dstOffest, int length)
         {
+            //将指定数目的字节从起始于特定偏移量的源数组复制到起始于特定偏移量的目标数组
             Buffer.BlockCopy(src, srcOffset, mBuffer, dstOffest, length);
         }
 
@@ -231,7 +243,7 @@ namespace CustomDataStruct
 
         public long Position()
         {
-            return mMemStream.Position;
+            return mMemStream.Position; //内存流的当前位置
         }
 
         // 走StreamBuffer缓存，无GC，注意回收
@@ -261,7 +273,7 @@ namespace CustomDataStruct
 
         public void ResetStream()
         {
-            memStream.Seek(0, SeekOrigin.Begin);
+            memStream.Seek(0, SeekOrigin.Begin); //被内存流指定到起始位置
         }
 
         public void SetPosition(long offset)
@@ -274,6 +286,8 @@ namespace CustomDataStruct
             mBuffer = null;
             if (mBinaryReader != null) mBinaryReader.Close();
             if (mBinaryWriter != null) mBinaryWriter.Close();
+            
+            //mMemStream Close后还要Dispose
             if (mMemStream != null) mMemStream.Close();
             if (mMemStream != null) mMemStream.Dispose();
             mBinaryReader = null;
