@@ -142,6 +142,7 @@ namespace Networks
 
         protected virtual void DoClose()
         {
+            //只单纯的close吗，进行了收发数据需要shutDown吧？
             mClientSocket.Close();
             if (mClientSocket.Connected)
             {
