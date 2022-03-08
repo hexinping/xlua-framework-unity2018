@@ -21,8 +21,11 @@ namespace Networks
 
         private List<HjNetworkEvt> mNetworkEvtList = null;
         private object mNetworkEvtLock = null;
-
+        
+        //最大发送字节数
         protected int mMaxBytesOnceSent = 0;
+        
+        //最大接收字节数，UpdateNetwork 主线程驱动
         protected int mMaxReceiveBuffer = 0;
 
         protected Socket mClientSocket = null;
@@ -30,13 +33,18 @@ namespace Networks
         protected int mPort;
         protected volatile SOCKSTAT mStatus = SOCKSTAT.CLOSED;
 
-
+        //接收线程
         private Thread mReceiveThread = null;
-        private volatile bool mReceiveWork = false;
+        
+        //https://www.cnblogs.com/gjhjoy/p/3556709.html
+        //一个变量经 volatile修饰后在所有线程中必须是同步的；任何线程中改变了它的值，所有其他线程立即获取到了相同的值
+        private volatile bool mReceiveWork = false; 
         private List<byte[]> mTempMsgList = null;
+        
+        //处理的消息队列
         protected IMessageQueue mReceiveMsgQueue = null;
         
-
+    
         public HjNetworkBase(int maxBytesOnceSent = 1024 * 512, int maxReceiveBuffer = 1024 * 1024 * 2)
         {
             mStatus = SOCKSTAT.CLOSED;
@@ -72,6 +80,7 @@ namespace Networks
         protected abstract void DoConnect();
         public void Connect()
         {
+            //连接之前先清理一遍
             Close();
 
             int result = ESocketError.NORMAL;
@@ -112,8 +121,9 @@ namespace Networks
         {
             if (mReceiveThread == null)
             {
+                //开启接收线程
                 mReceiveThread = new Thread(ReceiveThread);
-                mReceiveWork = true;
+                mReceiveWork = true; //所有线程同步这个变量
                 mReceiveThread.Start(null);
             }
         }
@@ -185,7 +195,10 @@ namespace Networks
                     if (!mReceiveWork) break;
                     if (mClientSocket != null)
                     {
+                        //bufferCurLen是用来记录本次接收了多少字节的，
+                        //mClientSocket.Receive第三个参数代表最大接收多少个字节，有时会接收不满，循环接收数据包，直到接收完全
                         int bufferLeftLen = receiveStreamBuffer.size - bufferCurLen;
+                        //开启接收数据，
                         int readLen = mClientSocket.Receive(receiveStreamBuffer.GetBuffer(), bufferCurLen, bufferLeftLen, SocketFlags.None);
                         if (readLen == 0) throw new ObjectDisposedException("DisposeEX", "receive from server 0 bytes,closed it");
                         if (readLen < 0) throw new Exception("Unknow exception, readLen < 0" + readLen);
@@ -259,6 +272,7 @@ namespace Networks
                         var objMsg = mTempMsgList[i];
                         if (ReceivePkgHandle != null)
                         {
+                            //回调到业务层，参数是字节数组，
                             ReceivePkgHandle(objMsg);
                         }
                     }
@@ -271,6 +285,7 @@ namespace Networks
                 {
                     for (int i = 0; i < mTempMsgList.Count; ++i)
                     {
+                        //回收buffer字节数组
                         StreamBufferPool.RecycleBuffer(mTempMsgList[i]);
                     }
                     mTempMsgList.Clear();

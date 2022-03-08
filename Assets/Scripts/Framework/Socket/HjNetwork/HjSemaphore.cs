@@ -32,7 +32,7 @@ namespace Networks
                 }
                 lock (this)
                 {
-                    //释放锁、进入等待队列
+                    //释放锁、进入等待队列 ==>会阻塞线程，阻塞的同时但会释放锁，再次获得锁的时候，需要monitor.Pulse唤醒
                     Monitor.Wait(this);
                 }
             }

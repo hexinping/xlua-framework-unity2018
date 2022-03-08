@@ -7,7 +7,7 @@ namespace Networks
     class MessageQueue : IMessageQueue
     {
         object mMutex;
-        List<byte[]> mMessageList;
+        List<byte[]> mMessageList; //处理的消息队列
 
         public MessageQueue(int capacity = 10)
         {
