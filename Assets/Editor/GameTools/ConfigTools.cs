@@ -88,7 +88,8 @@ public class ConfigTools : EditorWindow
 
         files.Clear();
         exported.Clear();
-
+        
+        //遍历所有的xlsx文件，文件名放到files里
         GetFilter(xlsxFolder + "/excel", "*.xlsx");
 
         foreach (var item in files)
@@ -96,6 +97,7 @@ public class ConfigTools : EditorWindow
             string fileName = Path.GetFileNameWithoutExtension(item);
 
             Process p = new Process();
+            //C# 执行python脚本
             p.StartInfo.FileName = "python";
             p.StartInfo.Arguments = string.Format("excel2lua.py excel/{0}.xlsx lua/{0}.lua", fileName);
             p.StartInfo.UseShellExecute = false;
